@@ -39,6 +39,21 @@ func TestRecover(t *testing.T) {
 	assert.Equal(expectedAddr, addr)
 }
 
+func BenchmarkRecover(b *testing.B) {
+	// From web3 1.0 example
+	encMsg := "0x1da44b586eb0729ff70a73c326926f6ed5a25f5b056e7f47fbc6e58d86871655"
+	// Sig encoded by web3.js
+	encSig := "0xb91467e570a6466aa9e9876cbcd013baba02900b8979d43fe208a4a4f339f5fd6007e74cd82e037b800186422fc2da167c747ef045e5d18a5f5d4300f8e1a0291c"
+
+	messageHash, _ := hexutil.Decode(encMsg)
+
+	sig, _ := hexutil.Decode(encSig)
+
+	for i := 0; i < b.N; i++ {
+		Recover(messageHash, sig)
+	}
+}
+
 func TestSign(t *testing.T) {
 	assert := assert.New(t)
 	encPk := "0x4c0883a69102937d6231471b5dbb6204fe5129617082792ae468d01a3f362318"
