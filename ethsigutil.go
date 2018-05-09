@@ -34,3 +34,14 @@ func HashMessage(data []byte) []byte {
 	msg := fmt.Sprintf("\x19Ethereum Signed Message:\n%d%s", len(data), data)
 	return crypto.Keccak256([]byte(msg))
 }
+
+// Sign calculates a signature for a hashed message using the given private key
+// Arbitrary data should first be hashed with HashMessage
+// Returns sig that can be used with Recover
+func Sign(messageHash, privKey []byte) ([]byte, error) {
+	pk, err := crypto.ToECDSA(privKey)
+	if err != nil {
+		return nil, err
+	}
+	return crypto.Sign(messageHash, pk)
+}
