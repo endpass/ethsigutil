@@ -5,6 +5,7 @@ package ethsigutil
 import (
 	"fmt"
 
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
@@ -28,6 +29,20 @@ func Recover(messageHash, sig []byte) (string, error) {
 	return addr.Hex(), nil
 }
 
+// RecoverString is a convenience function that lets Recover be used directly
+// with a hex encoded message hash and signature
+func RecoverString(messageHash, sig string) (string, error) {
+	msgBytes, err := hexutil.Decode(messageHash)
+	if err != nil {
+		return "", err
+	}
+	sigBytes, err := hexutil.Decode(sig)
+	if err != nil {
+		return "", err
+	}
+	return Recover(msgBytes, sigBytes)
+}
+
 // HashMessage hashes the given message for use with the recover function
 // The text to be hashed is computed as follows: "\x19Ethereum Signed Message:\n" + len(message) + message
 func HashMessage(data []byte) []byte {
@@ -44,4 +59,25 @@ func Sign(messageHash, privKey []byte) ([]byte, error) {
 		return nil, err
 	}
 	return crypto.Sign(messageHash, pk)
+}
+
+// SignString is a convenience function that lets Sign be used with a
+// hex-encoded message hash and private key, and returns the hex-encoded
+// signature string
+// The message should already have been hashed with Ethereum Signed Message
+// prefix
+func SignString(messageHash, privKey string) (string, error) {
+	msgBytes, err := hexutil.Decode(messageHash)
+	if err != nil {
+		return "", err
+	}
+	pkBytes, err := hexutil.Decode(privKey)
+	if err != nil {
+		return "", err
+	}
+	sig, err := Sign(msgBytes, pkBytes)
+	if err != nil {
+		return "", err
+	}
+	return hexutil.Encode(sig), nil
 }
