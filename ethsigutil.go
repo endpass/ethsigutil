@@ -24,7 +24,12 @@ func Recover(messageHash, sig []byte) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	pk := crypto.ToECDSAPub(rpk)
+
+	pk, err := crypto.UnmarshalPubkey(rpk)
+	if err != nil {
+		return "", err
+	}
+
 	addr := crypto.PubkeyToAddress(*pk)
 	return addr.Hex(), nil
 }
