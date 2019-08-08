@@ -63,7 +63,15 @@ func Sign(messageHash, privKey []byte) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return crypto.Sign(messageHash, pk)
+
+	sign, err := crypto.Sign(messageHash, pk)
+	if err != nil {
+		return nil, err
+	}
+
+	sign[64] += 27 // Transform V from 0/1 to 27/28 according to the yellow paper
+
+	return sign, nil
 }
 
 // SignString is a convenience function that lets Sign be used with a
